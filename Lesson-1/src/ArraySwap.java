@@ -1,3 +1,7 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class ArraySwap<T> {
 
     //Задание
@@ -11,21 +15,34 @@ public class ArraySwap<T> {
     }
 
     //метод меняющий первые два элемента местами
-    public void swap () {
-        print(array);
-        System.out.println();
-        T value = array[0];
-        array[0] = array[1];
-        array[1] = value;
-        print(array);
-        System.out.println();
+    public void swap (int el1, int el2) {
+        if (el1 >= 0 && el1 < array.length &&
+            el2 >= 0 && el2 < array.length) {
+            print();
+            System.out.println();
+            T value = array[el1];
+            array[el1] = array[el2];
+            array[el2] = value;
+            print();
+            System.out.println();
+        } else {
+            System.out.println("Ошибка! Введите индекс от 0 до 2");
+        }
     }
 
     //метод вывода массива в консоль
-    public void print(T... nums) {
-        for (int i = 0; i <nums.length; i++) {
-            System.out.print(nums[i] + " ");
+    public void print() {
+        for (int i = 0; i <array.length; i++) {
+            System.out.print(array[i] + " ");
         }
+    }
+
+    //Задание 2
+    //Написать метод, который преобразует массив в ArrayList;
+    public List<T> arrayToArrayList () {
+        List<T> arrayList = new ArrayList<>(Arrays.asList(array));
+        System.out.println(arrayList);
+        return arrayList;
     }
 }
 
