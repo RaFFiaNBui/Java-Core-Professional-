@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.controller.Controller">
+   <children>
+      <HBox fx:id="authPanel" alignment="CENTER" layoutX="95.0" layoutY="122.0">
+         <children>
+            <TextField fx:id="loginField" promptText="Логин" HBox.hgrow="ALWAYS" />
+            <PasswordField fx:id="passField" promptText="Пароль" HBox.hgrow="ALWAYS">
+               <HBox.margin>
+                  <Insets left="5.0" />
+               </HBox.margin>
+            </PasswordField>
+            <Button onAction="#sendAuth" text="Подключиться" HBox.hgrow="ALWAYS">
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </Button>
+         </children>
+         <VBox.margin>
+            <Insets left="10.0" right="10.0" />
+         </VBox.margin>
+      </HBox>
+<VBox fx:id="chatPanel" alignment="CENTER" prefHeight="400.0" prefWidth="600.0" spacing="5.0" style="-fx-background-color: silver; -fx-border-color: blue;" visible="false" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="2.0">
+   <children>
+      <HBox>
+         <children>
+            <ListView fx:id="clientList" style="-fx-border-color: blue; -fx-border-radius: 5; -fx-border-width: 1;">
+                     <HBox.margin>
+                        <Insets right="5.0" />
+                     </HBox.margin></ListView>
+            <TextArea fx:id="chatTextArea" editable="false" prefHeight="344.0" prefWidth="560.0" style="-fx-border-color: blue; -fx-border-radius: 5; -fx-border-width: 1;" wrapText="true" />
+         </children>
+      </HBox>
+      <HBox spacing="10.0">
+         <children>
+            <TextField fx:id="messageText" onAction="#sendText" style="-fx-border-color: blue; -fx-border-radius: 5;" HBox.hgrow="ALWAYS" />
+            <Button fx:id="sendMessageButton" minWidth="100.0" mnemonicParsing="false" onAction="#sendMessage" style="-fx-background-color: lightblue; -fx-border-color: blue; -fx-border-radius: 5;" text="Отправить">
+               <font>
+                  <Font name="Arial Bold" size="12.0" />
+               </font>
+            </Button>
+         </children>
+      </HBox>
+   </children>
+   <padding>
+      <Insets bottom="5" left="5" right="5" top="5" />
+   </padding>
+</VBox>
+   </children>
+</AnchorPane>
