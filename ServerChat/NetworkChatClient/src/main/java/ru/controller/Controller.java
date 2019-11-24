@@ -58,7 +58,6 @@ public class Controller implements Initializable {
         }
     }
 
-
     private void showError(Exception e) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Ошибка соединения с сервером!");
