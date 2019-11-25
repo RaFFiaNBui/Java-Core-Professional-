@@ -14,8 +14,12 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import ru.controller.message.IMessageService;
 import ru.controller.message.ServerMessageService;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -23,7 +27,7 @@ import static common.Message.createAuth;
 
 public class Controller implements Initializable {
 
-    public static final String ALL_ITEM = "All";
+    private static final String ALL_ITEM = "All";
 
     public @FXML
     TextArea chatTextArea;
@@ -99,6 +103,31 @@ public class Controller implements Initializable {
             Message msg = buildMessage(message);
             messageService.sendMessage(msg);
             messageText.clear();
+            writeLog(String.format("Я: %s%n", message));
+        }
+    }
+
+    private void writeLog(String logMsg) {
+        writeLog(logMsg, nickname);
+    }
+
+    public static void writeLog(String logMsg, String nickname) {
+        File log = new File("src/main/java/ru/controller/message/history/history_" + nickname + ".txt");
+        if (log.exists() && log.canWrite()) {
+            try (FileOutputStream out = new FileOutputStream(log, true);
+                 OutputStreamWriter writer = new OutputStreamWriter(out, StandardCharsets.UTF_8)
+            ) {
+                writer.write(logMsg);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            if (!log.exists()) {
+                System.out.println("File not found.");
+            }
+            if (!log.canWrite()) {
+                System.out.println("No write access.");
+            }
         }
     }
 

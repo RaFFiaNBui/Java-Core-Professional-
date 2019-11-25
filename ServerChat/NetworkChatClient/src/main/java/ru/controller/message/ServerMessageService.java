@@ -1,15 +1,15 @@
 package ru.controller.message;
 
 import common.*;
-import common.Message;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TextArea;
-import ru.controller.Controller;
-import ru.controller.Network;
+import ru.controller.*;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.io.*;
 
 public class ServerMessageService implements IMessageService {
 
@@ -23,6 +23,8 @@ public class ServerMessageService implements IMessageService {
     private Network network;
     private Controller controller;
     private boolean needStopServerOnClosed;
+
+    private String nick;
 
     public ServerMessageService(Controller controller, boolean needStopServerOnClosed) {
         this.chatTextArea = controller.chatTextArea;
@@ -88,14 +90,19 @@ public class ServerMessageService implements IMessageService {
                 throw new IllegalArgumentException("Unknown command type: " + message.command);
         }
     }
+
     private void processPublicMessage(Message message) {
         PublicMessage publicMessage = message.publicMessage;
         String from = publicMessage.from;
         String msg = publicMessage.message;
+        String msgNoNull = String.format("%s: %s%n", from, msg);
+        String msgNull = String.format("%s%n", msg);
         if (from != null) {
-            chatTextArea.appendText(String.format("%s: %s%n", from, msg));
+            chatTextArea.appendText(msgNoNull);
+            writeLog(msgNoNull);
         } else {
-            chatTextArea.appendText(String.format("%s%n", msg));
+            chatTextArea.appendText(msgNull);
+            writeLog(msgNull);
         }
     }
 
@@ -105,11 +112,59 @@ public class ServerMessageService implements IMessageService {
         String msg = privateMessage.message;
         String msgToView = String.format("%s (private): %s%n", from, msg);
         chatTextArea.appendText(msgToView);
+        writeLog(msgToView);
+    }
+
+    private void writeLog(String logMsg) {
+        Controller.writeLog(logMsg, nick);
     }
 
     private void processAuthOk(Message message) {
         controller.setNickName(message.authOkMessage.nickname);
         controller.showChatPanel();
+        this.nick = message.authOkMessage.nickname;
+        readLog();
+    }
+
+    private void readLog() {
+        //создаем лог файл, если он еще не создан
+        File log = new File("src/main/java/ru/controller/message/history/history_" + nick + ".txt");
+        if (!log.exists()) {
+            try {
+                log.createNewFile();
+            } catch (IOException e) {
+                showAlert();
+            }
+            System.out.println("Create history file for user " + nick);
+        }
+        //подтягиваем в окно чата последние 100 строк из лога
+        try (FileInputStream in = new FileInputStream(log);
+             InputStreamReader inStR = new InputStreamReader(in, StandardCharsets.UTF_8);
+             BufferedReader br = new BufferedReader(inStR)) {
+            //сохранем последнии 100 строк в коллекцию
+            List<String> history = new ArrayList<>();
+            for (String o; (o = br.readLine()) != null; ) {
+                if (history.add(o) && history.size() > 100) {
+                    history.remove(0);
+                }
+            }
+            //выводим коллекцию на экран
+            for (String s : history) {
+                chatTextArea.appendText(s);
+                chatTextArea.appendText(System.lineSeparator());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Reading " + nick + "'s user history file is successfully!");
+    }
+
+    private void showAlert() {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Файл истории сообщений не создан!");
+        alert.setHeaderText(null);
+        alert.setContentText("Возможно не хватает прав на создание файла");
+        alert.showAndWait();
     }
 
     @Override
