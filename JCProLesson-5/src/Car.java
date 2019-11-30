@@ -2,11 +2,8 @@ import java.util.concurrent.CyclicBarrier;
 
 public class Car implements Runnable {
     private static int CARS_COUNT;
-    //private CountDownLatch cd;
     private CyclicBarrier cb;
     private static boolean win;
-    //CyclicBarrier cb = new CyclicBarrier(4);
-    //CountDownLatch cd = new CountDownLatch(3);
     static {
         CARS_COUNT = 0;
     }
