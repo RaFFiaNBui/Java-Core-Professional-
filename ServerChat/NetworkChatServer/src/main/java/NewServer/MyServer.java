@@ -11,6 +11,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.apache.log4j.Logger;
 
 public class MyServer {
 
@@ -18,18 +19,24 @@ public class MyServer {
     private final AuthService authService = new BaseAuthService();
     private List<ClientHandler> clients = new ArrayList<>();
 
+    Logger admin = Logger.getLogger("admin");
+
     public MyServer() {
         System.out.println("Server is running");
+        admin.info("Server is running");
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             authService.start();
             while (true) {
                 System.out.println("Awaiting client connection...");
+                admin.info("Server awaiting client connection");
                 Socket socket = serverSocket.accept();
                 System.out.println("Client has connected");
+                admin.info("Client has connected");
                 new ClientHandler(socket, this);
             }
         } catch (IOException e) {
             System.err.println("Server start error. Cause: " + e.getMessage());
+            admin.fatal("Server start error");
             e.printStackTrace();
         } finally {
             authService.stop();

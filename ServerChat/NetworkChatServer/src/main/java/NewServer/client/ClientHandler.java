@@ -4,6 +4,7 @@ import NewServer.MyServer;
 import common.AuthMessage;
 import common.Command;
 import common.Message;
+import org.apache.log4j.Logger;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -20,6 +21,7 @@ public class ClientHandler {
     private Socket socket;
     private DataInputStream input;
     private DataOutputStream output;
+    Logger admin = Logger.getLogger("admin");
 
     public ClientHandler(Socket socket, MyServer myServer) {
         try {
@@ -41,6 +43,7 @@ public class ClientHandler {
             thread.setDaemon(true);
             thread.start();
         } catch (IOException e) {
+            admin.error("Failed to create client handler");
             throw new RuntimeException("Failed to create client handler", e);
         }
     }
@@ -49,6 +52,7 @@ public class ClientHandler {
         while (true) {
             String clientMessage = input.readUTF();
             System.out.printf("Message '%s' from client %s%n", clientMessage, clientName);
+            admin.trace("Message: " + clientMessage + " from client " + clientName);
             Message m = Message.fromJson(clientMessage);
             switch (m.command) {
                 case PUBLIC_MESSAGE:
@@ -70,6 +74,7 @@ public class ClientHandler {
             socket.close();
         } catch (IOException e) {
             System.err.println("Failed to close socket!");
+            admin.error("Failed to close socket!");
             e.printStackTrace();
         }
     }
@@ -84,6 +89,7 @@ public class ClientHandler {
                 synchronized (this) {
                     if (clientName == null) {
                         System.out.println("Authentication timed out!");
+                        admin.info("Authentication timed out");
                         sendMessage(Message.createAuthError("Время ожидания подключения истекло!"));
                         Thread.sleep(100);
                         socket.close();
@@ -106,10 +112,12 @@ public class ClientHandler {
                     String nick = myServer.getAuthService().getNickByLoginPass(login, password);
                     if (nick == null) {
                         sendMessage(Message.createAuthError("Неверные логин/пароль"));
+                        admin.warn("Введена неверная пара логин/пароль");
                         continue;
                     }
                     if (myServer.isNickBusy(nick)) {
                         sendMessage(Message.createAuthError("Учетная запись уже используется"));
+                        admin.warn("Учетная запись " + nick + " уже используется");
                         continue;
                     }
                     clientName = nick;
@@ -131,6 +139,7 @@ public class ClientHandler {
             output.writeUTF(message);
         } catch (IOException e) {
             System.err.println("Failed to send message to user " + clientName + " : " + message);
+            admin.trace("Failed to send message to user " + clientName + " : " + message);
             e.printStackTrace();
         }
     }
