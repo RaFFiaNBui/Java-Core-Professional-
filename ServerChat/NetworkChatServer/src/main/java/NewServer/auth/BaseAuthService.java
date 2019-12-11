@@ -1,6 +1,8 @@
 package NewServer.auth;
 
 
+import org.apache.log4j.Logger;
+
 import java.util.List;
 
 public class BaseAuthService implements AuthService {
@@ -26,6 +28,8 @@ public class BaseAuthService implements AuthService {
     @Override
     public void start() {
         System.out.println("Auth service is running");
+        Logger admin = Logger.getLogger("admin");
+        admin.info("Auth service is running");
     }
 
     @Override
